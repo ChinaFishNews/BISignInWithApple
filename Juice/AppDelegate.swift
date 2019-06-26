@@ -14,17 +14,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
         let appleIDProvider = ASAuthorizationAppleIDProvider()
         appleIDProvider.getCredentialState(forUserID: KeychainItem.currentUserIdentifier) { (credentialState, error) in
             switch credentialState {
             case .authorized:
-                // The Apple ID credential is valid.
+                // Apple ID凭据是有效的
                 break
             case .revoked:
-                // The Apple ID credential is revoked.
+                // 凭据被撤销
                 break
             case .notFound:
-                // No credential was found, so show the sign-in UI.
+                // 没有找到凭据，显示登录UI
                 DispatchQueue.main.async {
                     let storyboard = UIStoryboard(name: "Main", bundle: nil)
                     guard let viewController = storyboard.instantiateViewController(withIdentifier: "loginViewController") as? LoginViewController

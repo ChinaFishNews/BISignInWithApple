@@ -22,16 +22,15 @@ class ResultViewController: UIViewController {
     }
     
     @IBAction func signOutButtonPressed() {
-        // For the purpose of this demo app, delete the user identifier that was previously stored in the keychain.
+        // 删除之前存储在钥匙串中的用户标识符
         KeychainItem.deleteUserIdentifierFromKeychain()
         
-        // Clear the user interface.
         userIdentifierLabel.text = ""
         givenNameLabel.text = ""
         familyNameLabel.text = ""
         emailLabel.text = ""
         
-        // Display the login controller again.
+        // 显示登陆控制器
         DispatchQueue.main.async {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             guard let viewController = storyboard.instantiateViewController(withIdentifier: "loginViewController") as? LoginViewController

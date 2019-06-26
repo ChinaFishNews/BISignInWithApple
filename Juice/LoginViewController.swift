@@ -5,6 +5,14 @@ Abstract:
 Login view controller.
 */
 
+
+/*
+ ASAuthorizationAppleIDProvider ： 一种机制，用于根据用户的Apple ID生成对用户进行身份验证的请求
+ ASAuthorizationController： 管理提供程序创建的授权请求的控制器
+ ASAuthorizationAppleIDCredential：由成功的Apple ID身份验证产生的凭据
+*/
+
+
 import UIKit
 import AuthenticationServices
 
@@ -23,18 +31,19 @@ class LoginViewController: UIViewController {
     }
     
     func setupProviderLoginView() {
+        // Sign in with Apple按钮
         let authorizationButton = ASAuthorizationAppleIDButton()
         authorizationButton.addTarget(self, action: #selector(handleAuthorizationAppleIDButtonPress), for: .touchUpInside)
         self.loginProviderStackView.addArrangedSubview(authorizationButton)
     }
     
-    /// Prompts the user if an existing iCloud Keychain credential or Apple ID credential is found.
+    /// 用户是否找到现有的iCloud密钥凭据或Apple ID凭据
     func performExistingAccountSetupFlows() {
-        // Prepare requests for both Apple ID and password providers.
+        // 为苹果ID和密码提供者准备请求
         let requests = [ASAuthorizationAppleIDProvider().createRequest(),
                         ASAuthorizationPasswordProvider().createRequest()]
         
-        // Create an authorization controller with the given requests.
+        // 使用给定的请求创建授权控制器
         let authorizationController = ASAuthorizationController(authorizationRequests: requests)
         authorizationController.delegate = self
         authorizationController.presentationContextProvider = self
@@ -60,17 +69,16 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
             
             let userIdentifier = appleIDCredential.user
             let fullName = appleIDCredential.fullName
-            let email = appleIDCredential.email
+            let email = appleIDCredential.email // 只有第一次返回，之后返回nil
             
-            // Create an account in your system.
-            // For the purpose of this demo app, store the userIdentifier in the keychain.
+            // 在系统中创建一个帐户,将userIdentifier存储在keychain中
             do {
-                try KeychainItem(service: "com.example.apple-samplecode.juice", account: "userIdentifier").saveItem(userIdentifier)
+                try KeychainItem(service: "com.developer.baidu.juice", account: "userIdentifier").saveItem(userIdentifier)
             } catch {
                 print("Unable to save userIdentifier to keychain.")
             }
             
-            // For the purpose of this demo app, show the Apple ID credential information in the ResultViewController.
+            // 在ResultViewController中显示Apple ID凭据信息
             if let viewController = self.presentingViewController as? ResultViewController {
                 DispatchQueue.main.async {
                     viewController.userIdentifierLabel.text = userIdentifier
@@ -87,14 +95,13 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
                 }
             }
         } else if let passwordCredential = authorization.credential as? ASPasswordCredential {
-            // Sign in using an existing iCloud Keychain credential.
+            // 使用现有的iCloud密钥凭据登录
             let username = passwordCredential.user
             let password = passwordCredential.password
             
-            // For the purpose of this demo app, show the password credential as an alert.
             DispatchQueue.main.async {
-                let message = "The app has received your selected credential from the keychain. \n\n Username: \(username)\n Password: \(password)"
-                let alertController = UIAlertController(title: "Keychain Credential Received",
+                let message = "应用程序已经从钥匙串接收到您选择的凭据 \n\n Username: \(username)\n Password: \(password)"
+                let alertController = UIAlertController(title: "钥匙串凭证收到",
                                                         message: message,
                                                         preferredStyle: .alert)
                 alertController.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
@@ -104,7 +111,7 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        // Handle error.
+        print("error=\(error)")
     }
 }
 
